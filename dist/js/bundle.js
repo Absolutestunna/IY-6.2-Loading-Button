@@ -1,41 +1,56 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-console.log("Hello World!");
 var $ = require('jquery');
 var handlebars = require('handlebars');
 var Player = require('./models/player');
 
 
 // var buttonWork = new ButtonPlay();
+var teaminfo = new Player.team()
 var playerCollection = new Player.playerCollection();
+
+$('.bodi').fadeIn(2000);
 
 $(".submit").click(function(){
 
     this.textContent = "Loading...";
     $(".submit").attr("disabled", true);
 
-    playerCollection.fetch().done(function(event){
+    teaminfo.fetch().done(function(info){
+      var source = $('#team-info').html();
+      var template = handlebars.compile(source);
+      var context = {
+        tName: info.teams[0].name,
+        logo: info.teams[0].crestUrl,
+        value: info.teams[0].squadMarketValue
+      };
+      var html = template(context);
+      $('.bodi').append(html);
+    }).then(playerCollection.fetch().done(function(event){
       event.players.forEach(function(playerinfo){
 
         var source = $('#player-info').html();
         var template = handlebars.compile(source);
+        console.log(playerinfo)
+
         var context = {
           name: playerinfo.name,
-          position: playerinfo.jerseyNumber
+          number: playerinfo.jerseyNumber,
+          nationality: playerinfo.nationality,
+          position: playerinfo.position
         };
         var html = template(context);
-        $('.information').append(html);
+        $('.bodi').append(html);
      });
 
       $(".submit").removeAttr("disabled");
       $(".submit").html("Submit");
 
-    })
+    }))
+
+
 
 })
-
-
-// console.log(buttonCollection);
 
 },{"./models/player":2,"handlebars":34,"jquery":35}],2:[function(require,module,exports){
 "use strict";
@@ -48,15 +63,16 @@ headers: { 'X-Auth-Token': '78b09e9005224111ada83b285f5acb3c' },
 // url: 'http://api.football-data.org/v1/fixtures?timeFrame=n1',
 });
 
-var Player = Backbone.Model.extend({
+var Team = Backbone.Model.extend({
+  url: "http://api.football-data.org/v1/soccerseasons/398/teams",
   getStats: function(){
     // return this.get('name') + this.get('football')
   }
 })
 
 var PlayerCollection = Backbone.Collection.extend({
-  model: Player,
-  url: "http://api.football-data.org/v1/teams/450/players",
+  model: Team,
+  url: "http://api.football-data.org/v1/teams/66/players"
   // parse: function(team){
   //   return team.players;
   // }
@@ -72,7 +88,7 @@ var PlayerCollection = Backbone.Collection.extend({
 
 
 module.exports = {
-  player: Player,
+  team: Team,
   playerCollection: PlayerCollection
 };
 
