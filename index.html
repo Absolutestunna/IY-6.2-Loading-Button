@@ -1,12 +1,36 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Loading Button</title>
-    <meta http-equiv="refresh" content="0; url=dist/index.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+    <title>IY 6 2 Loading Button</title>
+    <link rel="stylesheet" href="css/app.css">
+    <link href='https://fonts.googleapis.com/css?family=Alegreya+Sans+SC:400,900italic' rel='stylesheet' type='text/css'>
   </head>
   <body>
 
+    <div class="bodi">
+      <button class="btn btn-secondary submit" id="submit2">Submit</button>
+    </div>
+
+    <div class="information"></div>
+
+    <script id="team-info" type="text/x-handlebars-template">
+      <div class="header">
+        <div class="logo"><img src="{{logo}}" alt=""></div>
+        <h1 class="team-name">{{tName}}</h1>
+        <h4>Valued at {{value}}</h4>
+      </div>
+
+    </script>
+    <script id="player-info" type="text/x-handlebars-template">
+      <div class="player-header">
+        <div class="name">{{name}} - {{number}}</div>
+        <div class="nationality">{{nationality}}</div>
+        <div class="position">{{position}}</div>
+
+      </div>
+    </script>
+    <script src="js/bundle.js"></script>
   </body>
 </html>
