@@ -8,7 +8,6 @@ var Player = require('./models/player');
 // var buttonWork = new ButtonPlay();
 var teaminfo = new Player.team()
 var playerCollection = new Player.playerCollection();
-
 $('.bodi').fadeIn(2000);
 
 $(".submit").click(function(){
@@ -17,36 +16,42 @@ $(".submit").click(function(){
     $(".submit").attr("disabled", true);
 
     teaminfo.fetch().done(function(info){
+      // console.log(teaminfo)
       var source = $('#team-info').html();
       var template = handlebars.compile(source);
       var context = {
-        tName: info.teams[0].name,
-        logo: info.teams[0].crestUrl,
-        value: info.teams[0].squadMarketValue
+        tName: teaminfo.get('name'),
+        logo: teaminfo.get('crestUrl'),
+        value: teaminfo.get('squadMarketValue')
+
       };
       var html = template(context);
       $('.bodi').append(html);
-    }).then(playerCollection.fetch().done(function(event){
-      event.players.forEach(function(playerinfo){
+    })
+    setTimeout(function(){
+      playerCollection.fetch().done(function(event){
+        playerCollection.each(function(playerinfo){
 
-        var source = $('#player-info').html();
-        var template = handlebars.compile(source);
-        console.log(playerinfo)
+          var source = $('#player-info').html();
+          var template = handlebars.compile(source);
 
-        var context = {
-          name: playerinfo.name,
-          number: playerinfo.jerseyNumber,
-          nationality: playerinfo.nationality,
-          position: playerinfo.position
-        };
-        var html = template(context);
-        $('.bodi').append(html);
-     });
+          var context = {
+            name: playerinfo.get('name'),
+            number: playerinfo.get('jerseyNumber'),
+            nationality: playerinfo.get('nationality'),
+            position: playerinfo.get('position')
+          };
+          console.log(context.name)
+          var html = template(context);
+          $('.bodi').append(html);
+       });
 
-      $(".submit").removeAttr("disabled");
-      $(".submit").html("Submit");
+        $(".submit").removeAttr("disabled");
+        $(".submit").html("Submit");
 
-    }))
+      })
+    }, 1000)
+
 
 
 
@@ -56,35 +61,27 @@ $(".submit").click(function(){
 "use strict";
 var Backbone = require('backbone');
 var $ = require('jquery');
-
+    
 
 $.ajaxSetup({
 headers: { 'X-Auth-Token': '78b09e9005224111ada83b285f5acb3c' },
-// url: 'http://api.football-data.org/v1/fixtures?timeFrame=n1',
 });
 
 var Team = Backbone.Model.extend({
   url: "http://api.football-data.org/v1/soccerseasons/398/teams",
-  getStats: function(){
+  parse: function(data){
     // return this.get('name') + this.get('football')
+    return data.teams[0];
   }
 })
 
 var PlayerCollection = Backbone.Collection.extend({
   model: Team,
-  url: "http://api.football-data.org/v1/teams/66/players"
-  // parse: function(team){
-  //   return team.players;
-  // }
+  url: "http://api.football-data.org/v1/teams/66/players",
+  parse: function(data){
+    return data.players;
+  }
 });
-
-//
-// var choicePlayer = new PlayerCollection();
-// // choicePlayer.create({
-// //   name: "Christiano Ronaldo",
-// //   Position: "Striker"
-// // },{},{},{},{},{});
-// // console.log(choicePlayer)
 
 
 module.exports = {
